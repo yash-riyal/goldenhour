@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c0d10" />
+  <title>Driver — Golden Hour</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    /* ── Phone-style single-column shell ──────────────────────── */
+    body {
+      background: var(--bg-1);
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+    }
+    .driver-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-bottom: 24px;
+    }
+
+    /* Top bar with brand, identity, available toggle */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--bg-1);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      border-bottom: 1px solid var(--border);
+    }
+    .top-bar .avatar-sm {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: grid; place-items: center;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .top-bar .id-block { flex: 1; min-width: 0; }
+    .top-bar .id-block strong { display:block; font-size: 0.95rem; line-height: 1.2; }
+    .top-bar .id-block .vehicle {
+      display: block; font-family: var(--font-mono);
+      font-size: 0.7rem; color: var(--text-2); letter-spacing: 0.05em;
+    }
+    .avail-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 10px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .avail-pill.on { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); border-color: color-mix(in srgb, var(--success) 40%, transparent); }
+    .avail-pill.off { color: var(--text-2); }
+    .avail-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .avail-pill.on .avail-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 25%, transparent); animation: livepulse 2s infinite; }
+
+    /* Icon-only theme toggle in the top bar */
+    .navbar-theme-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-1);
+      display: grid; place-items: center;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      flex-shrink: 0;
+    }
+    .navbar-theme-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(15deg);
+    }
+    .navbar-theme-btn:active { transform: rotate(0) scale(0.95); }
+
+    /* Sticky tab strip with scroll-snap navigation */
+    .tab-strip {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      background: var(--bg-1);
+      position: sticky;
+      top: 64px;
+      z-index: 29;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tab-strip::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 8px 14px;
+      border-radius: 99px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--text-1);
+      color: var(--bg-1);
+      border-color: var(--text-1);
+    }
+    .tab-btn .badge {
+      display: inline-block;
+      min-width: 18px; height: 18px;
+      padding: 0 5px;
+      border-radius: 99px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.65rem;
+      line-height: 18px;
+      text-align: center;
+      margin-left: 4px;
+      vertical-align: -1px;
+    }
+
+    /* Section base */
+    .section {
+      padding: 22px 18px 8px;
+      scroll-margin-top: 130px; /* offset for sticky tabs */
+    }
+    .section h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      margin: 0 0 6px;
+      line-height: 1.15;
+    }
+    .section h2 em { font-style: italic; color: var(--accent); }
+    .section .section-sub {
+      font-size: 0.85rem; color: var(--text-2);
+      margin-bottom: 16px;
+    }
+
+    /* SOS Card with countdown */
+    .sos-card {
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, var(--bg-2));
+      padding: 18px;
+      margin-bottom: 14px;
+      animation: sosPulse 1.8s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes sosPulse {
+      0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent); }
+      50%      { box-shadow: 0 0 0 12px transparent; }
+    }
+    /* Last 5 seconds — sharper, redder, faster pulse */
+    .sos-card.sos-urgent {
+      animation: sosPulseUrgent 0.7s ease-in-out infinite;
+      background: color-mix(in srgb, var(--accent) 14%, var(--bg-2));
+    }
+    .sos-card.sos-urgent .sos-countdown-bar { background: #ff1f25; }
+    .sos-card.sos-urgent .sos-meta .kv:nth-child(3) strong {
+      color: #ff1f25;
+      animation: timerBlink 0.5s ease-in-out infinite;
+    }
+    @keyframes sosPulseUrgent {
+      0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+      50%      { box-shadow: 0 0 0 16px transparent; }
+    }
+    @keyframes timerBlink {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.55; }
+    }
+    .sos-banner {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .sos-banner .dot {
+      width: 8px; height: 8px;
+      background: var(--accent); border-radius: 50%;
+      animation: livepulse 1.2s infinite;
+    }
+    .sos-code {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+    .sos-meta {
+      display: flex; gap: 14px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .sos-meta .kv strong {
+      display: block; font-size: 1.15rem;
+      font-family: var(--font-display);
+      line-height: 1;
+    }
+    .sos-meta .kv span {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-2);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .sos-countdown-track {
+      height: 4px;
+      background: var(--bg-3);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 14px 0 12px;
+    }
+    .sos-countdown-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 100%;
+      transition: width 0.1s linear;
+    }
+    .sos-actions {
+      display: flex; gap: 8px;
+    }
+    .sos-actions .btn { flex: 1; padding: 14px; font-size: 0.95rem; }
+
+    /* Active case card */
+    .active-card {
+      border-radius: var(--radius-lg);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .active-header {
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .active-header .code {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--text-2);
+    }
+    .active-header .title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-top: 2px;
+    }
+    .active-media {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: #000;
+      display: grid; place-items: center;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 16px;
+    }
+    .active-media img, .active-media video { width: 100%; height: 100%; object-fit: cover; }
+    .active-map { width: 100%; height: 260px; }
+    .active-body { padding: 16px; }
+    .active-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+      margin: 10px 0;
+    }
+    .active-grid .kv .label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--text-2);
+      text-transform: uppercase;
+    }
+    .active-grid .kv .value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-top: 2px;
+    }
+    .active-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .active-actions .btn { padding: 14px; font-size: 0.95rem; }
+    .photo-upload-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--accent);
+      background: color-mix(in srgb, var(--accent) 6%, transparent);
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .photo-upload-btn input { display: none; }
+
+    /* AI assessment box */
+    .ai-box {
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--info) 8%, var(--bg-3));
+      border: 1px solid color-mix(in srgb, var(--info) 25%, transparent);
+      padding: 14px;
+      margin-top: 10px;
+    }
+    .ai-box .ai-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--info);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .ai-box .ai-summary {
+      font-size: 0.92rem;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .ai-box .ai-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-2);
+    }
+    .ai-box.severe { border-color: color-mix(in srgb, var(--accent) 35%, transparent); background: color-mix(in srgb, var(--accent) 8%, var(--bg-3)); }
+    .ai-box.severe .ai-label { color: var(--accent); }
+
+    /* Compact history rows */
+    .history-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+    }
+    .history-row .left { flex: 1; min-width: 0; }
+    .history-row .row-code {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--text-2);
+    }
+    .history-row .row-title { font-weight: 500; margin-top: 1px; font-size: 0.92rem; }
+    .history-row .row-sub { font-size: 0.78rem; color: var(--text-2); margin-top: 2px; }
+
+    .empty-pad {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-2);
+      font-size: 0.88rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    /* KPI strip */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .kpi-row .kpi-mini {
+      padding: 12px 10px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+    .kpi-row .kpi-mini .v {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .kpi-row .kpi-mini .l {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      color: var(--text-2);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Settings rows — clean professional layout */
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      gap: 14px;
+    }
+    .settings-row-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .settings-row-label strong {
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+    .settings-row-hint {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-2);
+      letter-spacing: 0.04em;
+    }
+
+    /* Icon-only theme toggle button */
+    .theme-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      color: var(--text-1);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      flex-shrink: 0;
+    }
+    .theme-icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(15deg);
+    }
+    .theme-icon-btn:active {
+      transform: rotate(0deg) scale(0.95);
+    }
+
+    /* On wider screens, allow the phone container to center cleanly */
+    @media (min-width: 460px) {
+      body { background: var(--bg-1); }
+      .driver-shell {
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="driver-shell">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="avatar-sm" id="avatar">D</div>
+      <div class="id-block">
+        <strong id="user-name" data-i18n="role.driver">Driver</strong>
+        <span class="vehicle" id="user-vehicle">—</span>
+      </div>
+      <button class="theme-toggle lang-toggle" data-lang-toggle aria-label="Cycle language" title="Cycle language (EN / हि / मर)">EN</button>
+      <button class="navbar-theme-btn" onclick="toggleThemeIcon()" aria-label="Toggle theme">
+        <svg id="navbar-theme-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg id="navbar-theme-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="avail-pill on" id="avail-pill" role="button">
+        <span class="avail-dot"></span>
+        <span id="avail-label" data-i18n="driver.onduty">ON DUTY</span>
+      </div>
+    </div>
+
+    <!-- Tab strip -->
+    <nav class="tab-strip" id="tab-strip">
+      <button class="tab-btn active" data-target="sos"><span data-i18n="driver.tab.sos">SOS</span> <span class="badge" id="sos-count" hidden>0</span></button>
+      <button class="tab-btn" data-target="active" data-i18n="driver.tab.active">Active</button>
+      <button class="tab-btn" data-target="map" data-i18n="driver.tab.map">Map</button>
+      <button class="tab-btn" data-target="history" data-i18n="driver.tab.history">History</button>
+      <button class="tab-btn" data-target="settings" data-i18n="driver.tab.settings">Settings</button>
+    </nav>
+
+    <!-- SECTION: SOS -->
+    <section class="section" id="sec-sos">
+      <h2 data-i18n="driver.sos.title" data-i18n-html>Live <em>SOS</em></h2>
+      <div class="section-sub" id="sos-sub" data-i18n="driver.sos.sub">Standing by. New emergencies will pop up here with a 15-second decision window.</div>
+      <div id="sos-list"></div>
+
+      <div class="kpi-row" style="margin-top: 18px;">
+        <div class="kpi-mini"><div class="v" id="kpi-open">0</div><div class="l" data-i18n="driver.kpi.open">Open</div></div>
+        <div class="kpi-mini"><div class="v" id="kpi-active">0</div><div class="l" data-i18n="driver.kpi.myActive">My active</div></div>
+        <div class="kpi-mini"><div class="v" id="kpi-done">0</div><div class="l" data-i18n="driver.kpi.doneToday">Done today</div></div>
+      </div>
+    </section>
+
+    <!-- SECTION: Active -->
+    <section class="section" id="sec-active">
+      <h2 data-i18n="driver.active.title" data-i18n-html>Active <em>case</em></h2>
+      <div class="section-sub" id="active-sub" data-i18n="driver.active.sub">You don't have an active case right now.</div>
+      <div id="active-wrap"></div>
+    </section>
+
+    <!-- SECTION: Map -->
+    <section class="section" id="sec-map">
+      <h2 data-i18n="driver.map.title" data-i18n-html>Live <em>map</em></h2>
+      <div class="section-sub" data-i18n="driver.map.sub">Your live position, the scene, and the assigned hospital.</div>
+      <div id="map" class="active-map" style="height: 380px; border-radius: var(--radius-md); border: 1px solid var(--border);"></div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <a id="open-gmaps" href="#" target="_blank" class="btn btn-outline btn-sm" style="flex:1;" data-i18n="driver.openGMaps">Open in Google Maps ↗</a>
+      </div>
+    </section>
+
+    <!-- SECTION: History -->
+    <section class="section" id="sec-history">
+      <h2 data-i18n="driver.history.title" data-i18n-html>My <em>history</em></h2>
+      <div class="section-sub" data-i18n="driver.history.sub">Past 50 cases assigned to you.</div>
+      <div id="history-list"></div>
+    </section>
+
+    <!-- SECTION: Settings -->
+    <section class="section" id="sec-settings" style="padding-bottom: 40px;">
+      <h2 data-i18n="driver.settings.title">Settings</h2>
+      <div class="section-sub" data-i18n="driver.settings.sub">Account.</div>
+
+      <div class="settings-row">
+        <div class="settings-row-label">
+          <strong data-i18n="driver.settings.account">Account</strong>
+          <span class="settings-row-hint" id="settings-email">—</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="RA.Auth.logout()" data-i18n="btn.signout">Sign out</button>
+      </div>
+
+      <div class="mono text-xs muted" style="margin-top: 16px; text-align: center;">
+        <span data-i18n="driver.footer">Golden Hour · Driver Console</span> · <span id="clock">--:--:--</span>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/driver.js"></script>
+</body>
+</html>

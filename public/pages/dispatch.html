@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dispatch Simulator — Golden Hour</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    body { display: grid; place-items: center; min-height: 100vh; padding: 32px; }
+    .dispatch-shell {
+      max-width: 720px; width: 100%;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .sos-button {
+      width: 100%; padding: 22px 24px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: all 0.2s var(--ease);
+      box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 30%, transparent);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .sos-button:hover { transform: translateY(-1px); box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .sos-button:active { transform: translateY(0); }
+    .sos-button em {
+      font-style: italic;
+      font-weight: 400;
+      opacity: 0.92;
+    }
+    .sos-button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .dispatch-feed { display: flex; flex-direction: column; gap: 8px; }
+    .dispatch-row {
+      padding: 14px 18px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      animation: slideIn 0.3s var(--ease);
+    }
+    .dispatch-row .meta { color: var(--text-2); font-family: var(--font-mono); font-size: 0.72rem; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .nav-back { color: var(--text-2); text-decoration: none; font-size: 0.85rem; }
+    .nav-back:hover { color: var(--text-1); }
+  </style>
+</head>
+<body>
+  <div class="dispatch-shell">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <a href="/" class="nav-back"><span data-i18n="btn.back">← Back</span></a>
+      <div style="display:flex; align-items:center; gap: 14px;">
+        <span class="mono text-xs muted" data-i18n="dispatch.eyebrow2">DISPATCH · 112 SIMULATOR</span>
+        <button data-lang-toggle aria-label="Cycle language" title="Cycle language"
+                style="width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text-1);display:grid;place-items:center;cursor:pointer;transition:all 0.2s;font-size:11px;font-weight:600;">EN</button>
+        <button onclick="RA.toggleTheme()" aria-label="Toggle theme"
+                style="width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text-1);display:grid;place-items:center;cursor:pointer;transition:all 0.2s;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <span class="eyebrow"><span class="live-dot"></span>&nbsp;&nbsp;<span data-i18n="dispatch.eyebrow">CONTROL ROOM</span></span>
+      <h1 style="font-family: var(--font-display); font-size: 2.4rem; line-height: 1.1; margin-top: 12px;" data-i18n="dispatch.title" data-i18n-html>
+        Simulate an <em style="font-style:italic;color:var(--accent)">incoming</em> 112 call.
+      </h1>
+      <p class="muted" style="margin-top: 12px;" data-i18n="dispatch.sub">
+        In production this app receives location data automatically from the 112 phone network.
+        For demo purposes, click below to spawn a random emergency anywhere in Pune.
+      </p>
+    </div>
+
+    <button class="sos-button" id="sos-btn">
+      <span data-i18n="dispatch.simulate" data-i18n-html>⚠&nbsp; Simulate <em>112 Call</em></span>
+    </button>
+
+    <div>
+      <div class="section-title">
+        <h3 data-i18n="dispatch.recent" data-i18n-html>Recent <em>dispatches</em></h3>
+        <span class="mono text-xs muted" id="count">0</span>
+      </div>
+      <div class="dispatch-feed" id="feed">
+        <div class="muted" style="padding: 24px; text-align: center; border: 1px dashed var(--border); border-radius: var(--radius-md);" data-i18n="dispatch.empty">
+          No calls dispatched yet. Click the red button to simulate one.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    const btn = document.getElementById('sos-btn');
+    const feed = document.getElementById('feed');
+    const count = document.getElementById('count');
+    const dispatches = [];
+
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.innerHTML = (RA.t('dispatch.dispatching') || '⏳ Dispatching…');
+      try {
+        const res = await fetch('/api/emergency/sos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})  // server picks random Pune coords
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || (RA.t('dispatch.failed') || 'Dispatch failed'));
+
+        dispatches.unshift(data.emergency);
+        renderFeed();
+
+        if (data.no_drivers) {
+          RA.toast(RA.t('dispatch.noDrivers') || 'No drivers available',
+                   RA.t('dispatch.noDriversBody') || 'No ambulance is currently on duty.',
+                   'warning', 5000);
+        } else {
+          const word = data.drivers_notified === 1
+            ? (RA.t('dispatch.ambulance') || 'ambulance')
+            : (RA.t('dispatch.ambulances') || 'ambulances');
+          RA.toast(
+            `${data.emergency.request_code} ` + (RA.t('dispatch.dispatched') || 'dispatched'),
+            `${RA.t('dispatch.broadcastTo') || 'Broadcast to'} ${data.drivers_notified} ${word} · ${Math.round(data.window_ms/1000)}s ${RA.t('dispatch.window') || 'window'}`,
+            'success'
+          );
+        }
+      } catch (err) {
+        RA.toast(RA.t('common.error') || 'Error', err.message, 'warning');
+      } finally {
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<span data-i18n="dispatch.simulate" data-i18n-html>⚠&nbsp; Simulate <em>112 Call</em></span>';
+          RA.setLang(RA.getLang());
+        }, 800);
+      }
+    });
+
+    function renderFeed() {
+      count.textContent = dispatches.length;
+      if (!dispatches.length) return;
+      feed.innerHTML = dispatches.slice(0, 20).map(e => `
+        <div class="dispatch-row">
+          <div>
+            <strong>${e.request_code}</strong>
+            <div class="meta">${e.caller_phone || '—'} · ${e.reporter_lat.toFixed(4)}, ${e.reporter_lng.toFixed(4)}</div>
+          </div>
+          <span class="pill pill-requested">${RA.t('status.requested') || 'REQUESTED'}</span>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Golden Hour — Emergency Response, Reimagined</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="/" class="brand">
+        <div class="brand-mark"></div>
+        <div>
+          <span data-i18n="brand.name">Golden Hour</span>
+          <small data-i18n="brand.tag">Response System</small>
+        </div>
+      </a>
+      <nav class="nav-actions">
+        <button class="theme-toggle lang-toggle" data-lang-toggle aria-label="Cycle language" title="Cycle language (EN / हि / मर)">EN</button>
+        <button class="theme-toggle" onclick="RA.toggleTheme()" aria-label="Toggle theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
+        <a href="/pages/login.html" class="btn btn-ghost btn-sm" data-i18n="nav.login">Sign in</a>
+        <a href="/pages/dispatch.html" class="btn btn-primary btn-sm" data-i18n="nav.simulator">112 Simulator</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="container hero-content">
+      <span class="eyebrow"><span class="live-dot" style="vertical-align:middle"></span>&nbsp;&nbsp;<span data-i18n="landing.eyebrow">Real-time response network — operational</span></span>
+      <h1 data-i18n="landing.hero.title" data-i18n-html>Every second <em>matters.</em><br/>So does every signal.</h1>
+      <p data-i18n="landing.hero.sub">Golden Hour is a unified emergency response platform connecting 112 dispatch, ambulance drivers, hospitals, and blood banks through a single real-time coordination layer. AI-powered injury triage. Atomic bed reservation. Zero friction.</p>
+      <div class="hero-cta">
+        <a href="/pages/dispatch.html" class="btn btn-primary btn-lg">
+          <span data-i18n="landing.cta.simulator">Try 112 Simulator</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="/pages/login.html" class="btn btn-outline btn-lg" data-i18n="landing.cta.signin">Sign in to Dashboard</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-block">
+          <strong>&lt;<em>15</em>s</strong>
+          <span data-i18n="landing.stat.window">Driver-acceptance window</span>
+        </div>
+        <div class="stat-block">
+          <strong><em>3</em> <span data-i18n="landing.stat.roles">roles</span></strong>
+          <span data-i18n="landing.stat.rolesList">Driver · Hospital · Blood Bank</span>
+        </div>
+        <div class="stat-block">
+          <strong><em>AI</em></strong>
+          <span data-i18n="landing.stat.triage">Triage from a single photo</span>
+        </div>
+        <div class="stat-block">
+          <strong>24<em>/</em>7</strong>
+          <span data-i18n="landing.stat.coord">Real-time socket coordination</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="role-section">
+    <div class="container">
+      <div style="max-width: 720px;">
+        <span class="eyebrow" data-i18n="landing.network.eyebrow">The Network</span>
+        <h2 style="margin-top: 16px;" data-i18n="landing.network.title" data-i18n-html>Built for the people who <em>show up.</em></h2>
+        <p class="mt-2 muted" data-i18n="landing.network.sub">Three role-based dashboards. One coordinated response. Designed for the unforgiving choreography of emergency medicine.</p>
+      </div>
+
+      <div class="role-grid">
+        <a href="/pages/login.html?role=driver" class="card role-card card-hover">
+          <div class="role-card-mark">01</div>
+          <h3 data-i18n="role.driver">Ambulance Driver</h3>
+          <p data-i18n="landing.driver.desc">Receive incoming requests with victim media and one-tap navigation. Auto-routed to nearest scene. Live status updates from acceptance through hospital arrival.</p>
+          <span class="role-card-link" data-i18n="landing.driver.cta">Driver login →</span>
+        </a>
+        <a href="/pages/login.html?role=hospital" class="card role-card card-hover">
+          <div class="role-card-mark">02</div>
+          <h3 data-i18n="role.hospital">Hospital</h3>
+          <p data-i18n="landing.hospital.desc">Live ambulance tracking on map. ETA estimates. Patient media preview. Trigger critical blood requests instantly to the connected blood bank network.</p>
+          <span class="role-card-link" data-i18n="landing.hospital.cta">Hospital login →</span>
+        </a>
+        <a href="/pages/login.html?role=bloodbank" class="card role-card card-hover">
+          <div class="role-card-mark">03</div>
+          <h3 data-i18n="role.bloodbank">Blood Bank</h3>
+          <p data-i18n="landing.bloodbank.desc">Receive instant alerts for critical blood-type requirements with originating hospital location. Respond, dispatch, and track in a single interface.</p>
+          <span class="role-card-link" data-i18n="landing.bloodbank.cta">Blood bank login →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 80px 0;">
+    <div class="container">
+      <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 56px; align-items: center;">
+        <div>
+          <span class="eyebrow" data-i18n="landing.flow.eyebrow">System Flow</span>
+          <h2 style="margin-top: 16px;" data-i18n="landing.flow.title" data-i18n-html>From 112 call to <em>hospital bed.</em></h2>
+          <p class="mt-2 muted" data-i18n="landing.flow.sub">112 receives the call; location is auto-derived from the network. The nearest 5 ambulances get a 15-second SOS alert. On arrival, the driver photographs the injury — AI returns severity, blood needs, and the right hospital bed type. A bed gets reserved atomically before the ambulance even moves.</p>
+          <a href="/pages/dispatch.html" class="btn btn-primary mt-3" data-i18n="landing.flow.cta">Try the simulator</a>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:grid;place-items:center;color:#fff;font-family:var(--font-mono);font-weight:600;">1</div>
+            <div><strong data-i18n="landing.flow.step1.t">112 receives the call</strong><div class="text-xs muted" data-i18n="landing.flow.step1.d">Location auto-derived from the network.</div></div>
+          </div>
+          <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:grid;place-items:center;color:#fff;font-family:var(--font-mono);font-weight:600;">2</div>
+            <div><strong data-i18n="landing.flow.step2.t">15-second SOS to top 5 drivers</strong><div class="text-xs muted" data-i18n="landing.flow.step2.d">First accept wins. Auto-assigns nearest on timeout.</div></div>
+          </div>
+          <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--info);display:grid;place-items:center;color:#fff;font-family:var(--font-mono);font-weight:600;">3</div>
+            <div><strong data-i18n="landing.flow.step3.t">Driver photographs injury at scene</strong><div class="text-xs muted" data-i18n="landing.flow.step3.d">AI determines severity, bed type, blood need.</div></div>
+          </div>
+          <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--success);display:grid;place-items:center;color:#fff;font-family:var(--font-mono);font-weight:600;">4</div>
+            <div><strong data-i18n="landing.flow.step4.t">Bed reserved · Blood dispatched</strong><div class="text-xs muted" data-i18n="landing.flow.step4.d">Hospital and blood bank notified with full case context.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="border-top: 1px solid var(--border); padding: 32px 0; margin-top: 60px;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div class="flex gap-2" style="align-items:center;">
+        <div class="brand-mark" style="width:24px;height:24px;"></div>
+        <span class="mono text-xs muted">GOLDEN HOUR · v1.0 · 2026</span>
+      </div>
+      <div class="mono text-xs muted" data-i18n="landing.footer.demo">Demo system — not for actual emergencies. Call your local emergency number.</div>
+    </div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+</body>
+</html>

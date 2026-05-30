@@ -1,0 +1,21 @@
+# Environment
+.env
+.env.local
+
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Database & uploads
+server/db/*.db
+server/uploads/*
+!server/uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# IDE
+.vscode/
+.idea/

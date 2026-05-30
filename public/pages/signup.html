@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — Golden Hour</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="auth-shell">
+    <aside class="auth-hero">
+      <div class="auth-hero-grid"></div>
+      <a href="/" class="brand" style="color: white; position: relative;">
+        <div class="brand-mark"></div>
+        <div><span data-i18n="brand.name">Golden Hour</span><small style="color:rgba(255,255,255,0.5)" data-i18n="brand.tag">Response System</small></div>
+      </a>
+
+      <div style="position: relative;">
+        <span class="eyebrow" style="color: rgba(255,255,255,0.6)" data-i18n="auth.signup.eyebrow">JOIN THE NETWORK</span>
+        <h1 style="margin-top: 16px;" data-i18n="auth.signup.title" data-i18n-html>Register as a <em>responder.</em></h1>
+        <p style="margin-top: 16px; color: rgba(255,255,255,0.75); max-width: 480px;" data-i18n="auth.signup.sub">Drivers, hospitals, and blood banks — register to receive real-time emergency requests routed by location and need.</p>
+      </div>
+
+      <div class="auth-meta">
+        <div><strong data-i18n="auth.meta.free">Free</strong><span data-i18n="auth.meta.toRegister">To register</span></div>
+        <div><strong data-i18n="auth.meta.2min">2 min</strong><span data-i18n="auth.meta.setup">Setup</span></div>
+        <div><strong data-i18n="auth.meta.live">Live</strong><span data-i18n="auth.meta.immediately">Immediately</span></div>
+      </div>
+    </aside>
+
+    <main class="auth-form-wrap">
+      <div class="auth-form">
+        <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <span class="eyebrow" data-i18n="auth.signup.create">Create account</span>
+          <button class="theme-toggle lang-toggle" data-lang-toggle aria-label="Cycle language" title="Cycle language (EN / हि / मर)">EN</button>
+          <button class="theme-toggle" onclick="RA.toggleTheme()" aria-label="Toggle theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          </button>
+        </div>
+        <h2 data-i18n="auth.signup.h2" data-i18n-html>Register with <em style="font-family:var(--font-display);font-style:italic;color:var(--accent)">Golden Hour</em></h2>
+        <p class="subtitle" data-i18n="auth.signup.choose">Choose your role to begin receiving real-time emergency dispatches.</p>
+
+        <div class="role-tabs" id="role-tabs">
+          <div class="role-tab active" data-role="driver" data-i18n="role.driver">Driver</div>
+          <div class="role-tab" data-role="hospital" data-i18n="role.hospital">Hospital</div>
+          <div class="role-tab" data-role="bloodbank" data-i18n="role.bloodbank">Blood Bank</div>
+        </div>
+
+        <div class="error-msg" id="error-msg"></div>
+        <div class="success-msg" id="success-msg"></div>
+
+        <form id="signup-form">
+          <div class="field">
+            <label id="name-label" data-i18n="label.name">Full Name</label>
+            <input type="text" name="name" id="name" required placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label data-i18n="label.email">Email Address</label>
+            <input type="email" name="email" id="email" required placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label data-i18n="label.phone">Phone</label>
+            <input type="tel" name="phone" id="phone" placeholder="+91 ..." />
+          </div>
+
+          <!-- Driver fields -->
+          <div id="driver-fields">
+            <div class="field">
+              <label data-i18n="label.vehicle">Vehicle Number</label>
+              <input type="text" name="vehicle_number" placeholder="MH-12-AB-1234" />
+            </div>
+            <div class="field">
+              <label data-i18n="label.license">License Number</label>
+              <input type="text" name="license_number" placeholder="DL-1420110012345" />
+            </div>
+          </div>
+
+          <!-- Hospital/Bloodbank fields -->
+          <div id="org-fields" style="display: none;">
+            <div class="field">
+              <label id="org-label" data-i18n="label.organization">Organisation Name</label>
+              <input type="text" name="org_name" placeholder="Eg. Ruby Hall Clinic" />
+            </div>
+            <div class="field">
+              <label data-i18n="label.address">Address</label>
+              <input type="text" name="address" placeholder="Street, City" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label data-i18n="label.passwordMin">Password (min 6 chars)</label>
+            <input type="password" name="password" id="password" required minlength="6" placeholder="••••••••" />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">
+            <span data-i18n="btn.createAccount">Create Account</span>
+          </button>
+        </form>
+
+        <div class="text-center mt-3 muted text-sm">
+          <span data-i18n="auth.haveAccount">Have an account?</span> <a href="/pages/login.html" style="color: var(--accent); font-weight: 600;" data-i18n="nav.login">Sign in</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentRole = 'driver';
+    function updateRoleUI() {
+      const isDriver = currentRole === 'driver';
+      document.getElementById('driver-fields').style.display = isDriver ? '' : 'none';
+      document.getElementById('org-fields').style.display = isDriver ? 'none' : '';
+      const nameKey = isDriver ? 'label.name' : 'label.contactName';
+      const orgKey = currentRole === 'hospital' ? 'label.hospitalName' : 'label.bloodbankName';
+      document.getElementById('name-label').textContent = RA.t(nameKey) || (isDriver ? 'Full Name' : 'Contact Person Name');
+      document.getElementById('org-label').textContent = RA.t(orgKey) || (currentRole === 'hospital' ? 'Hospital Name' : 'Blood Bank Name');
+      // Also keep i18n attributes synced so language switch re-translates correctly
+      document.getElementById('name-label').setAttribute('data-i18n', nameKey);
+      document.getElementById('org-label').setAttribute('data-i18n', orgKey);
+    }
+    document.querySelectorAll('.role-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentRole = tab.dataset.role;
+        updateRoleUI();
+      });
+    });
+
+    const errBox = document.getElementById('error-msg');
+    const okBox = document.getElementById('success-msg');
+    function showError(msg) { errBox.textContent = msg; errBox.classList.add('show'); okBox.classList.remove('show'); }
+    function showOk(msg) { okBox.textContent = msg; okBox.classList.add('show'); errBox.classList.remove('show'); }
+
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const body = Object.fromEntries(fd.entries());
+      body.role = currentRole;
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>' + (RA.t('btn.creatingAccount') || 'Creating account...') + '</span>';
+      try {
+        const data = await RA.api('/api/auth/signup', { method: 'POST', body });
+        if (!data || !data.token || !data.user) {
+          throw new Error(RA.t('auth.incompleteResponse') || 'Server returned an incomplete response. Try again.');
+        }
+        RA.Auth.token = data.token;
+        RA.Auth.user = data.user;
+        showOk(RA.t('auth.created') || 'Account created — opening your dashboard…');
+        const dashMap = { driver: '/pages/driver.html', hospital: '/pages/hospital.html', bloodbank: '/pages/bloodbank.html' };
+        const target = dashMap[data.user.role] || '/';
+        setTimeout(() => {
+          try { window.location.replace(target); }
+          catch { window.location.href = target; }
+        }, 400);
+      } catch (err) {
+        showError(err.message || (RA.t('auth.registrationFailed') || 'Registration failed'));
+        btn.disabled = false;
+        btn.innerHTML = '<span>' + (RA.t('btn.createAccount') || 'Create Account') + '</span>';
+      }
+    });
+  </script>
+</body>
+</html>

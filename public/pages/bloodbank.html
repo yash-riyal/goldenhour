@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blood Bank Dashboard — Golden Hour</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="dash">
+    <aside class="sidebar">
+      <a href="/" class="sidebar-brand">
+        <div class="brand-mark"></div>
+        <div style="font-family: var(--font-display); font-size: 1.1rem;"><span data-i18n="brand.name">Golden Hour</span><small style="display:block;font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.2em;color:var(--text-2);text-transform:uppercase;" data-i18n="role.bloodbank">Blood Bank</small></div>
+      </a>
+
+      <div class="sidebar-section" data-i18n="hospital.ops">Operations</div>
+      <div class="sidebar-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 0c-3 3-5 6-5 9a5 5 0 0 0 10 0c0-3-2-6-5-9z"/></svg>
+        <span data-i18n="bb.liveAlerts">Live Alerts</span>
+      </div>
+
+      <div class="sidebar-section" data-i18n="bb.status">Status</div>
+      <div class="sidebar-link">
+        <span class="live-dot"></span>
+        <span style="flex:1" data-i18n="bb.online">Realtime online</span>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="user-chip-avatar" id="avatar">B</div>
+          <div class="user-chip-meta">
+            <strong id="user-name" data-i18n="role.bloodbank">Blood Bank</strong>
+            <span id="user-org">—</span>
+          </div>
+        </div>
+        <div class="flex gap-1 mt-2">
+          <button class="theme-toggle lang-toggle" data-lang-toggle aria-label="Cycle language" title="Cycle language (EN / हि / मर)">EN</button>
+          <button class="theme-toggle" onclick="RA.toggleTheme()" aria-label="Theme">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="RA.Auth.logout()" style="flex:1;" data-i18n="btn.signout">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <span class="eyebrow"><span class="live-dot"></span>&nbsp;&nbsp;<span data-i18n="bb.standingBy">STANDING BY</span></span>
+          <h2 style="margin-top: 8px;" data-i18n="bb.title" data-i18n-html>Blood <em>Operations.</em></h2>
+        </div>
+        <div class="page-header-meta">
+          <span class="mono text-xs" id="clock">--:--:--</span>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label" data-i18n="bb.kpi.pending">Pending</div><div class="kpi-value kpi-accent" id="kpi-pending">0</div></div>
+        <div class="kpi"><div class="kpi-label" data-i18n="bb.kpi.accepted">Accepted Today</div><div class="kpi-value" id="kpi-accepted">0</div></div>
+        <div class="kpi"><div class="kpi-label" data-i18n="bb.kpi.fulfilled">Fulfilled</div><div class="kpi-value kpi-success" id="kpi-fulfilled">0</div></div>
+        <div class="kpi"><div class="kpi-label" data-i18n="bb.kpi.total">Total Today</div><div class="kpi-value" id="kpi-total">0</div></div>
+      </div>
+
+      <div class="section-title">
+        <h3 data-i18n="bb.incomingAlerts" data-i18n-html>Incoming <em>blood alerts</em></h3>
+        <span class="mono text-xs muted" id="alert-count">0</span>
+      </div>
+      <div id="alert-list">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal" id="modal-body"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/bloodbank.js"></script>
+</body>
+</html>
